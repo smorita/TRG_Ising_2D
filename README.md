@@ -12,15 +12,17 @@ The tensor renormalization group method (TRG) and the higher-order TRG method (H
 ## Requirements
 
 - Python3
-- Numpy
-- Scipy
+- NumPy
+- SciPy (`scipy.linalg`, `scipy.special`, `scipy.integrate`)
 
 ## Notes
 
 - The computational cost of TRG and HOTRG scale as O(chi^6) and O(chi^7), respectively.
   For O(chi^5) TRG algorithm, please check our PRE paper.
 - The memory usage in both methods is O(chi^4).
+  In HOTRG, the loop blocking technique is used to reduce memory usage.
 - The codes do not support the external magnetic field.
+- Animations of TRG and HOTRG are available on https://smorita.github.io/TN_animation/.
 
 ## References
 
