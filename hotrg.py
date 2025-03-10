@@ -13,7 +13,7 @@ from trg import TRG
 
 
 class HOTRG(TRG):
-    def __init__(self, temp, chi):
+    def __init__(self, temp: float, chi: int) -> None:
         super().__init__(temp, chi)
         self.method = "HOTRG"
 
@@ -22,7 +22,7 @@ class HOTRG(TRG):
         self.update_hotrg("y")
         self.step += 1
 
-    def update_hotrg(self, direction):
+    def update_hotrg(self, direction: str) -> None:
         if direction == "y":
             axes_trans = (1, 2, 3, 0)
             axes_inv = (3, 0, 1, 2)
@@ -46,17 +46,15 @@ class HOTRG(TRG):
         self.n_spins.append(2 * self.n_spins[-1])
 
 
-def contract_a4(a):
+def contract_a4(a: np.ndarray) -> np.ndarray:
     return np.tensordot(
-        np.tensordot(
-            a, a, ([2, 3], [2, 3])
-        ), np.tensordot(
-            a, a, ([1, 2], [1, 2])
-        ), ([1, 3], [1, 3])
+        np.tensordot(a, a, ([2, 3], [2, 3])),
+        np.tensordot(a, a, ([1, 2], [1, 2])),
+        ([1, 3], [1, 3]),
     )
 
 
-def contract_a2u2(a, u):
+def contract_a2u2(a: np.ndarray, u: np.ndarray) -> np.ndarray:
     shape = a.shape
     n = u.shape[2]
     a_new = np.zeros((n, shape[1], n, shape[3]), dtype=float)
@@ -64,17 +62,15 @@ def contract_a2u2(a, u):
     # loop blocking to reduce memory usage
     for j0, j1 in get_block(shape[1]):
         a_new += np.tensordot(
-            np.tensordot(
-                u, a[:, :, :, j0:j1], ([1], [0])
-            ), np.tensordot(
-                u, a[:, j0:j1, :, :], ([0], [2])
-            ), ([0, 3, 4], [2, 0, 3])
+            np.tensordot(u, a[:, :, :, j0:j1], ([1], [0])),
+            np.tensordot(u, a[:, j0:j1, :, :], ([0], [2])),
+            ([0, 3, 4], [2, 0, 3]),
         )
 
     return a_new
 
 
-def get_block(n):
+def get_block(n: int) -> list[tuple[int, int]]:
     block_size = 4
     block_list = [(i, i + block_size) for i in range(0, n, block_size)]
     if n % block_size != 0:
@@ -84,15 +80,20 @@ def get_block(n):
 
 if __name__ == "__main__":
     import argparse
-    parser = argparse.ArgumentParser(description="HOTRG simulation of the 2D Ising model",
-                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
+    parser = argparse.ArgumentParser(
+        description="HOTRG simulation of the 2D Ising model",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
     parser.add_argument("chi", type=int, default=8, nargs="?", help="Bond dimension")
     parser.add_argument("step", type=int, default=16, nargs="?", help="HOTRG steps")
-    parser.add_argument("T", type=float, default=ising.T_C, nargs="?", help="Temperature")
+    parser.add_argument(
+        "T", type=float, default=ising.T_C, nargs="?", help="Temperature"
+    )
     args = parser.parse_args()
 
-    Chi = args.chi
-    Step = args.step
-    T = args.T
+    chi = args.chi
+    step = args.step
+    temp = args.T
 
-    HOTRG(T, Chi).run(Step)
+    HOTRG(temp, chi).run(step)

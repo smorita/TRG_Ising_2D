@@ -5,6 +5,7 @@ Reference:
     M. Levin, C. P. Nave: Phys. Rev. Lett. 99, 120601 (2007)
 """
 
+import time
 import textwrap
 import numpy as np
 
@@ -13,7 +14,7 @@ import common
 
 
 class TRG:
-    def __init__(self, temp, chi):
+    def __init__(self, temp: float, chi: int) -> None:
         self.method = "TRG"
         self.temp = temp
         self.chi = chi
@@ -25,10 +26,10 @@ class TRG:
         self.n_spins = [n_spin]
         self.step = 0
 
-    def trace(self):
+    def trace(self) -> float:
         return np.einsum("ijij->", self.A)
 
-    def log_Z(self):
+    def log_Z(self) -> float:
         trace_a = self.trace()
         # if trace_a < 0.0:
         #     logging.warning("Negative trace_a %e (%d)", trace_a, self.step)
@@ -36,10 +37,10 @@ class TRG:
         log_z += np.log(abs(trace_a)) / self.n_spins[-1]
         return log_z
 
-    def free_energy(self):
+    def free_energy(self) -> float:
         return -self.temp * self.log_Z()
 
-    def update(self):
+    def update(self) -> None:
         # SVD (top, right) - (bottom, left)
         u, s, vt = common.svd(self.A, [0, 1], [2, 3], self.chi)
         sqrt_s = np.sqrt(s)
@@ -54,9 +55,8 @@ class TRG:
 
         # Contraction
         self.A = np.tensordot(
-            np.tensordot(c0, c1, (1, 2)),
-            np.tensordot(c2, c3, (1, 1)),
-            ((1, 3), (2, 0)))
+            np.tensordot(c0, c1, (1, 2)), np.tensordot(c2, c3, (1, 1)), ((1, 3), (2, 0))
+        )
 
         # normalize
         factor = self.trace()
@@ -66,47 +66,62 @@ class TRG:
         self.n_spins.append(2 * self.n_spins[-1])
         self.step += 1
 
-    def print_legend(self):
+    def print_preamble(self) -> None:
         output = f"""\
             # {self.method} for Ising model on the square lattice
-            # chi= {self.chi}
-            # T= {self.temp}
-            # f_exact= {self.f_exact:.12e}
+            # chi = {self.chi}
+            # T = {self.temp}
+            # f_exact = {self.f_exact:.12e}"""
+        print(textwrap.dedent(output))
+
+    def print_legend(self) -> None:
+        output = """\
             # 1: step
             # 2: N_spin
             # 3: free energy
             # 4: Relative error in the free energy, (f-f_exact)/f_exact"""
         print(textwrap.dedent(output))
 
-    def print_results(self):
+    def print_results(self) -> None:
         n_spin = self.n_spins[-1]
         f = self.free_energy()
         f_err = (f - self.f_exact) / self.f_exact
-        results = [f"{self.step:04d}",
-                   f"{n_spin:.12e}",
-                   f"{f:.12e}",
-                   f"{f_err:.12e}"]
+        results = [f"{self.step:04d}", f"{n_spin:.12e}", f"{f:.12e}", f"{f_err:.12e}"]
         print(" ".join(results))
 
-    def run(self, step):
+    def print_elapsed_time(self, elapsed_time: float) -> None:
+        print(f"# Elapsed time: {elapsed_time:.6f} sec")
+
+    def run(self, step: int) -> None:
+        self.print_preamble()
         self.print_legend()
         self.print_results()
+        
+        time_start = time.perf_counter()
         for i in range(step):
             self.update()
             self.print_results()
+        time_end = time.perf_counter()
+
+        self.print_elapsed_time(time_end - time_start)
 
 
 if __name__ == "__main__":
     import argparse
-    parser = argparse.ArgumentParser(description="TRG simulation of the 2D Ising model",
-                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
+    parser = argparse.ArgumentParser(
+        description="TRG simulation of the 2D Ising model",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
     parser.add_argument("chi", type=int, default=8, nargs="?", help="Bond dimension")
     parser.add_argument("step", type=int, default=16, nargs="?", help="TRG steps")
-    parser.add_argument("T", type=float, default=ising.T_C, nargs="?", help="Temperature")
+    parser.add_argument(
+        "T", type=float, default=ising.T_C, nargs="?", help="Temperature"
+    )
     args = parser.parse_args()
 
-    Chi = args.chi
-    Step = args.step
-    T = args.T
+    chi = args.chi
+    step = args.step
+    temp = args.T
 
-    TRG(T, Chi).run(Step)
+    TRG(temp, chi).run(step)
