@@ -1,0 +1,10 @@
+[project]
+name = "trg-ising-2d"
+version = "0.1.0"
+description = "Simple TRG code for the 2D Ising model"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "numpy>=2.2.3",
+    "scipy>=1.15.2",
+]
