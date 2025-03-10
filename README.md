@@ -7,7 +7,10 @@ The tensor renormalization group method (TRG) and the higher-order TRG method (H
 ```
 ./trg.py [chi] [step] [temperature]
 ./hotrg.py [chi] [step] [temperature]
+./bwtrg.py [-k k] [chi] [step] [temperature]
 ```
+
+Use `-h` option for more details.
 
 ## Requirements
 
@@ -29,3 +32,4 @@ The tensor renormalization group method (TRG) and the higher-order TRG method (H
 - M. Levin, C. P. Nave: Phys. Rev. Lett. 99, 120601 (2007)
 - Z. Y. Xie, et al.: Phys. Rev. B 86, 045139 (2012)
 - S. Morita, R. Igarashi, H.-H. Zhao, and N. Kawashima: Phys. Rev. E 97, 033310 (2018)
+- D. Adachi, T. Okkubo and S. Todo: Phys. Rev. B 105, L060402 (2022)

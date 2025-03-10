@@ -85,3 +85,30 @@ def initial_TN(temp: float) -> tuple[np.ndarray, float, float]:
 
     n_spin = 1.0  # An initial tensor has one spin.
     return (a, log_factor, n_spin)
+
+
+def initial_BWTN(temp: float) -> tuple[np.ndarray, np.ndarray, np.ndarray, float]:
+    """Initial bond-weighted tensor of the ising model on the square lattice.
+
+    Args:
+        temp: Temperature
+
+    Returns:
+        a: Initial 4-leg tensor. [top, right, bottom, left]
+        w0: bond weight on the vertical bond
+        w1: bond weight on the horizontal bond
+        n_spin: The number of spins which contained the initial tensor.
+    """
+    shape = (2, 2, 2, 2)
+    a = np.zeros(shape, dtype=float)  # [top, right, bottom, left]
+    for idx in np.ndindex(shape):
+        if sum(idx) % 2 == 0:
+            a[idx] = 0.5
+
+    c = np.cosh(1.0 / temp)
+    s = np.sinh(1.0 / temp)
+    w0 = 2.0 * np.array([c, s])
+    w1 = 2.0 * np.array([c, s])
+
+    n_spin = 1.0  # An initial tensor has one spin.
+    return (a, w0, w1, n_spin)

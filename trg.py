@@ -79,13 +79,13 @@ class TRG:
             # 1: step
             # 2: N_spin
             # 3: free energy
-            # 4: Relative error in the free energy, (f-f_exact)/f_exact"""
+            # 4: Relative error in the free energy, (f-f_exact)/|f_exact|"""
         print(textwrap.dedent(output))
 
     def print_results(self) -> None:
         n_spin = self.n_spins[-1]
         f = self.free_energy()
-        f_err = (f - self.f_exact) / self.f_exact
+        f_err = (f - self.f_exact) / abs(self.f_exact)
         results = [f"{self.step:04d}", f"{n_spin:.12e}", f"{f:.12e}", f"{f_err:.12e}"]
         print(" ".join(results))
 
