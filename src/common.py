@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Common parts of TRG and HOTRG algorithms for the Ising model on the square lattice"""
 
-from collections.abc import Iterator
 from typing import Optional
 import numpy as np
 import scipy.linalg as spl
@@ -9,8 +8,8 @@ import scipy.linalg as spl
 
 def svd(
     a: np.ndarray,
-    axes0: Iterator[int],
-    axes1: Iterator[int],
+    axes0: list[int],
+    axes1: list[int],
     rank: Optional[int] = None,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Singular value decomposition for tensor.
